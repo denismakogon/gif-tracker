@@ -1,16 +1,21 @@
 package com.giphy.app;
 
 import org.bytedeco.javacpp.Loader;
+import org.bytedeco.javacv.Java2DFrameConverter;
+import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Rect;
 import org.bytedeco.opencv.opencv_core.RectVector;
 import org.bytedeco.opencv.opencv_objdetect.CascadeClassifier;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
 import org.bytedeco.opencv.opencv_core.*;
+
+import static org.bytedeco.opencv.global.opencv_imgcodecs.imwrite;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 
 
@@ -40,12 +45,12 @@ public class FaceDetect {
         return new CascadeClassifier(classifierName);
     }
 
-    public void drawFaces(Mat frame, RectVector faces) {
+    public Mat drawFaces(Mat frame, RectVector faces) {
         long nFaces = faces.size();
 
         System.out.println("Faces detected: " + nFaces);
         if (nFaces == 0) {
-            return;
+            return frame;
         }
 
         int[] bbox = new int[4];
@@ -64,5 +69,12 @@ public class FaceDetect {
                     2, 1, 0
             );
         }
+        return frame;
+    }
+
+    public Mat processImage(BufferedImage frame) {
+        Mat mat = new OpenCVFrameConverter.ToMat().convert(new Java2DFrameConverter().convert(frame));
+        detectFaces(mat);
+        return drawFaces(mat, detectFaces(mat));
     }
 }
