@@ -20,16 +20,16 @@ public class App {
         GifSequenceParser gifParser = new GifSequenceParser(new File("giphy.gif"));
         try {
             ArrayList<Mat> frames = gifParser.parseToFrames();
-            FaceDetect faceDetect = new FaceDetect();
+//            FaceDetect faceDetect = new FaceDetect();
 
             // ImageOutputStream output = new FileImageOutputStream(new File("final.gif"));
             // GifSequenceWriter writer = new GifSequenceWriter(output, BufferedImage.TYPE_INT_RGB, 250, true);
 
-            for (Mat mat: frames) {
-                RectVector faces = faceDetect.detectFaces(mat);
-                faceDetect.drawFaces(mat, faces);
-                imwrite(String.format("%s-%d.jpg", "output", frames.indexOf(mat)), mat);
-            }
+//            for (Mat mat: frames) {
+//                RectVector faces = faceDetect.detectFaces(mat);
+//                faceDetect.drawFaces(mat, faces);
+//                imwrite(String.format("%s-%d.jpg", "output", frames.indexOf(mat)), mat);
+//            }
 
             // writer.close();
             // output.close();
