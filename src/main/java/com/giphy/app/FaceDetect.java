@@ -1,8 +1,6 @@
 package com.giphy.app;
 
 import org.bytedeco.javacpp.Loader;
-import org.bytedeco.javacv.Java2DFrameConverter;
-import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Rect;
 import org.bytedeco.opencv.opencv_core.RectVector;
@@ -12,9 +10,14 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.bytedeco.opencv.opencv_core.*;
 
+import javax.imageio.ImageIO;
+
+import static org.bytedeco.opencv.global.opencv_imgcodecs.imread;
 import static org.bytedeco.opencv.global.opencv_imgcodecs.imwrite;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 
@@ -39,7 +42,9 @@ public class FaceDetect {
     }
 
     private CascadeClassifier setupClasifier() throws IOException {
-        URL url = new URL("https://raw.github.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_alt.xml");
+        URL url = new URL(
+                "https://raw.github.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_alt.xml"
+        );
         File file = Loader.cacheResource(url);
         String classifierName = file.getAbsolutePath();
         return new CascadeClassifier(classifierName);
@@ -48,7 +53,6 @@ public class FaceDetect {
     public Mat drawFaces(Mat frame, RectVector faces) {
         long nFaces = faces.size();
 
-        System.out.println("Faces detected: " + nFaces);
         if (nFaces == 0) {
             return frame;
         }
@@ -72,9 +76,29 @@ public class FaceDetect {
         return frame;
     }
 
-    public Mat processImage(BufferedImage frame) {
-        Mat mat = new OpenCVFrameConverter.ToMat().convert(new Java2DFrameConverter().convert(frame));
-        detectFaces(mat);
-        return drawFaces(mat, detectFaces(mat));
+    public BufferedImage processImage(int index, String fileName) throws IOException {
+        String finalFileName = String.format("final-%d.jpg", index);
+        Mat mat = imread(fileName);
+        imwrite(
+                String.format("final-%d.jpg", index),
+                drawFaces(
+                        mat, detectFaces(mat)
+                )
+        );
+        return ImageIO.read(new File(finalFileName));
+    }
+
+    public void cleaUp(int range) {
+        try {
+            for (int i =0; i < range; ++i) {
+                Files.deleteIfExists(
+                        Paths.get(
+                                String.format("final-%d.jpg", i)
+                        )
+                );
+            }
+        } catch (IOException e) {
+            // do nothing
+        }
     }
 }
