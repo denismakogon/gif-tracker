@@ -6,19 +6,11 @@ import org.bytedeco.opencv.opencv_core.Rect;
 import org.bytedeco.opencv.opencv_core.RectVector;
 import org.bytedeco.opencv.opencv_objdetect.CascadeClassifier;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import org.bytedeco.opencv.opencv_core.*;
-
-import javax.imageio.ImageIO;
-
-import static org.bytedeco.opencv.global.opencv_imgcodecs.imread;
-import static org.bytedeco.opencv.global.opencv_imgcodecs.imwrite;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 
 
@@ -36,8 +28,12 @@ public class FaceDetect {
     }
 
     public RectVector detectFaces(Mat frame) {
+        Mat gray = new Mat ();
+        cvtColor(frame, gray, COLOR_BGR2GRAY);
+        equalizeHist(gray, gray);
+
         RectVector faces = new RectVector();
-        this.classifier.detectMultiScale(frame, faces);
+        this.classifier.detectMultiScale(gray, faces);
         return faces;
     }
 
@@ -50,55 +46,36 @@ public class FaceDetect {
         return new CascadeClassifier(classifierName);
     }
 
-    public Mat drawFaces(Mat frame, RectVector faces) {
+    public BufferedImage drawFaces(BufferedImage orig, RectVector faces) {
         long nFaces = faces.size();
 
         if (nFaces == 0) {
-            return frame;
+            return orig;
         }
 
-        int[] bbox = new int[4];
+        BasicStroke basicStroke = new BasicStroke(10);
         for (int iface = 0; iface < nFaces; ++iface) {
             Rect rect = faces.get(iface);
 
-            bbox[0] = rect.x();
-            bbox[1] = rect.y();
-            bbox[2] = rect.x() + rect.width();
-            bbox[3] = rect.y() + rect.height();
-
-            rectangle(frame,
-                    new Point(bbox[0], bbox[1]),
-                    new Point(bbox[2], bbox[3]),
-                    new Scalar(255, 0, 255, 128),
-                    2, 1, 0
+            Graphics2D orig2D = orig.createGraphics();
+            orig2D.drawRect(
+                    rect.x(), rect.y(),
+                    rect.width(), rect.height()
             );
+            orig2D.setStroke(basicStroke);
+            orig2D.dispose();
         }
-        return frame;
+        return orig;
     }
 
-    public BufferedImage processImage(int index, String fileName) throws IOException {
-        String finalFileName = String.format("final-%d.jpg", index);
-        Mat mat = imread(fileName);
-        imwrite(
-                String.format("final-%d.jpg", index),
-                drawFaces(
-                        mat, detectFaces(mat)
-                )
+    /**
+     *
+     *
+     * */
+    public BufferedImage processImageFromMat(Pair matFrame) {
+
+        return drawFaces(
+                matFrame.getLeft(), detectFaces(matFrame.getRight())
         );
-        return ImageIO.read(new File(finalFileName));
-    }
-
-    public void cleaUp(int range) {
-        try {
-            for (int i =0; i < range; ++i) {
-                Files.deleteIfExists(
-                        Paths.get(
-                                String.format("final-%d.jpg", i)
-                        )
-                );
-            }
-        } catch (IOException e) {
-            // do nothing
-        }
     }
 }

@@ -13,23 +13,31 @@ public class App {
     public static void main(String[] args) {
 
         try {
-            GifDecoder gifDecoder = new GifDecoder();
+
+            // note: GIF file must be an instance of InputStream
+            // note: for the sake of simplicity while obtaining GIF from the internet
+            FileInputStream originalGifFileStream = new FileInputStream("original.gif");
+
+            // note: output stream might not be just a file
+            // note: it could be whatever implements OutputStream interface
             ImageOutputStream output = new FileImageOutputStream(new File("final.gif"));
+
+            GifDecoder gifDecoder = new GifDecoder();
             GifEncoder writer = new GifEncoder(
                     output, BufferedImage.TYPE_INT_RGB, 0, true);
             FaceDetect faceDetect = new FaceDetect();
 
-            ArrayList<String> framePaths = gifDecoder.saveFramesFrom("original.gif");
-            for (String imgPath: framePaths) {
+            // note: Pair class is just a placeholder for origin GIF frame and its OpenCV Mat representation
+            ArrayList<Pair> mats = gifDecoder.framesToMat(originalGifFileStream);
+
+            for (Pair matFrame: mats) {
                 writer.writeToSequence(
-                        faceDetect.processImage(framePaths.indexOf(imgPath), imgPath)
+                        faceDetect.processImageFromMat(matFrame)
                 );
             }
 
-             writer.close();
-             output.close();
-             gifDecoder.close();
-             faceDetect.cleaUp(framePaths.size());
+            writer.close();
+            output.close();
 
         } catch (IOException e) {
             e.printStackTrace();

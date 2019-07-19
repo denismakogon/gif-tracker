@@ -1,13 +1,14 @@
 package com.giphy.app;
 
+import org.bytedeco.javacv.Java2DFrameUtils;
+import org.bytedeco.opencv.opencv_core.Mat;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.*;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class GifDecoder {
@@ -757,6 +758,25 @@ public class GifDecoder {
         } while ((blockSize > 0) && !err());
     }
 
+    /**
+     *
+     *
+     * */
+    public ArrayList<Pair> framesToMat(InputStream gifSource) {
+        read(gifSource);
+        ArrayList<Pair> mats = new ArrayList<>();
+        int n = getFrameCount();
+        for (int i = 0; i < n; i++) {
+            BufferedImage frame = getFrame(i);
+            mats.add(new Pair(frame, Java2DFrameUtils.toMat(frame)));
+        }
+        return mats;
+    }
+
+    /**
+     *
+     *
+     * */
     public ArrayList<String> saveFramesFrom(String gifFile) throws IOException {
         read(gifFile);
         ArrayList<String> framePaths = new ArrayList<>();
@@ -769,17 +789,5 @@ public class GifDecoder {
             framePaths.add(filePath);
         }
         return framePaths;
-    }
-
-    public void close() {
-        int n = getFrameCount();
-        for (int i = 0; i < n; i++) {
-            String filePath = String.format("output-%d.png", i);
-            try {
-                Files.deleteIfExists(Paths.get(filePath));
-            } catch (IOException e) {
-                // do nothing
-            }
-        }
     }
 }
