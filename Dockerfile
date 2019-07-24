@@ -1,8 +1,11 @@
-FROM denismakogon/java-11-opencv-debian:4.1.0-runtime
+FROM openjdk:13
+
+RUN curl -L https://raw.githubusercontent.com/denismakogon/java-opencv/master/apply_binaries.sh | /bin/bash
 
 # required by javacv
-RUN apt-get update && apt-get install --no-install-recommends -qy libgtk2.0
+RUN yum update -y && yum install -y gtk2-devel
 ADD original.gif /original.gif
-ADD target/gif-processor-1.0-jar-with-dependencies.jar /gif-processor-1.0-jar-with-dependencies.jar
+ADD target/*.jar /target/
+ADD entrypoint.sh /entrypoint.sh
 
-ENTRYPOINT ["java", "-cp", "/gif-processor-1.0-jar-with-dependencies.jar", "com.giphy.app.App", "/giphy.gif"]
+ENTRYPOINT ["/bin/bash", "entrypoint.sh"]

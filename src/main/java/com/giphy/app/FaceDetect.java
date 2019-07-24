@@ -1,6 +1,7 @@
 package com.giphy.app;
 
 import org.bytedeco.javacpp.Loader;
+import org.bytedeco.javacv.Java2DFrameUtils;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Rect;
 import org.bytedeco.opencv.opencv_core.RectVector;
@@ -11,24 +12,44 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 
 
 public class FaceDetect {
 
     private CascadeClassifier classifier = null;
+    private Fiber downloadFiber;
 
-    public FaceDetect() {
-        try {
-            this.classifier = this.setupClasifier();
-        } catch (IOException e) {
-            System.err.println(e.toString());
-            System.exit(1);
-        }
+    FaceDetect() {
+        this.downloadFiber = FiberScope.background().schedule(() -> {
+            try {
+                this.setupClassifier();
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+        });
     }
 
-    public RectVector detectFaces(Mat frame) {
-        Mat gray = new Mat ();
+    public Boolean isInitialized() {
+        return classifier != null;
+    }
+
+    private RectVector detectFaces(Mat frame) {
+        try {
+            if (!isInitialized()) {
+                this.downloadFiber.toFuture().get();
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        var gray = new Mat();
         cvtColor(frame, gray, COLOR_BGR2GRAY);
         equalizeHist(gray, gray);
 
@@ -37,16 +58,16 @@ public class FaceDetect {
         return faces;
     }
 
-    private CascadeClassifier setupClasifier() throws IOException {
+    private void setupClassifier() throws IOException {
         URL url = new URL(
                 "https://raw.github.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_alt.xml"
         );
         File file = Loader.cacheResource(url);
         String classifierName = file.getAbsolutePath();
-        return new CascadeClassifier(classifierName);
+        this.classifier = new CascadeClassifier(classifierName);
     }
 
-    public BufferedImage drawFaces(BufferedImage orig, RectVector faces) {
+    private BufferedImage drawFaces(BufferedImage orig, RectVector faces) {
         long nFaces = faces.size();
 
         if (nFaces == 0) {
@@ -68,14 +89,34 @@ public class FaceDetect {
         return orig;
     }
 
-    /**
-     *
-     *
-     * */
-    public BufferedImage processImageFromMat(Pair matFrame) {
+    private BufferedImage doDetection(GifDecoder gifDecoder, Integer fiberIndex) {
+        System.out.println(String.format("entering fiber '%d'", fiberIndex));
+        var frame = gifDecoder.getFrame(fiberIndex);
+        System.out.println(String.format("fiber '%d': frame obtained", fiberIndex));
+        var frameMat = Java2DFrameUtils.toMat(gifDecoder.getFrame(fiberIndex));
+        System.out.println(String.format("fiber '%d': frame converted to Mat", fiberIndex));
+        var faces = detectFaces(frameMat);
+        System.out.println(String.format("fiber '%d': end of detection", fiberIndex));
+        var finalFrame = drawFaces(frame, faces);
+        System.out.println(String.format("fiber '%d': building final frame", fiberIndex));
 
-        return drawFaces(
-                matFrame.getLeft(), detectFaces(matFrame.getRight())
-        );
+        return finalFrame;
+    }
+
+    public void processFrameWithDetections(
+            FiberWaitGroup wg, GifDecoder gifDecoder) {
+
+        int n = gifDecoder.getFrameCount();
+
+        for (int i = 0; i < n; i++) {
+            final var newI = i;
+            var f = FiberScope.background().schedule(() -> {
+                var img = doDetection(gifDecoder, newI);
+                System.out.println(String.format("fiber '%d' is out", newI));
+                return img;
+            });
+
+            wg.add(i, f);
+        }
     }
 }

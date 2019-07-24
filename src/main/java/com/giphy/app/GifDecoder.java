@@ -1,7 +1,6 @@
 package com.giphy.app;
 
 import org.bytedeco.javacv.Java2DFrameUtils;
-import org.bytedeco.opencv.opencv_core.Mat;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -10,6 +9,7 @@ import java.awt.image.DataBufferInt;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class GifDecoder {
 
@@ -756,38 +756,5 @@ public class GifDecoder {
         do {
             readBlock();
         } while ((blockSize > 0) && !err());
-    }
-
-    /**
-     *
-     *
-     * */
-    public ArrayList<Pair> framesToMat(InputStream gifSource) {
-        read(gifSource);
-        ArrayList<Pair> mats = new ArrayList<>();
-        int n = getFrameCount();
-        for (int i = 0; i < n; i++) {
-            BufferedImage frame = getFrame(i);
-            mats.add(new Pair(frame, Java2DFrameUtils.toMat(frame)));
-        }
-        return mats;
-    }
-
-    /**
-     *
-     *
-     * */
-    public ArrayList<String> saveFramesFrom(String gifFile) throws IOException {
-        read(gifFile);
-        ArrayList<String> framePaths = new ArrayList<>();
-        int n = getFrameCount();
-        for (int i = 0; i < n; i++) {
-            String filePath = String.format("output-%d.png", i);
-            BufferedImage frame = getFrame(i);
-            ImageIO.write(frame, "png",
-                    new File(filePath));
-            framePaths.add(filePath);
-        }
-        return framePaths;
     }
 }
