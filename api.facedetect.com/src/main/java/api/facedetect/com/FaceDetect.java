@@ -93,7 +93,7 @@ public class FaceDetect {
         System.out.println(String.format("entering fiber '%d'", fiberIndex));
         var frame = gifDecoder.getFrame(fiberIndex);
         System.out.println(String.format("fiber '%d': frame obtained", fiberIndex));
-        var frameMat = Java2DFrameUtils.toMat(gifDecoder.getFrame(fiberIndex));
+        var frameMat = Java2DFrameUtils.toMat(frame);
         System.out.println(String.format("fiber '%d': frame converted to Mat", fiberIndex));
         var faces = detectFaces(frameMat);
         System.out.println(String.format("fiber '%d': end of detection", fiberIndex));
