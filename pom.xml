@@ -7,10 +7,7 @@
   <groupId>com.giphy.app</groupId>
   <artifactId>gif-processor</artifactId>
   <version>1.0</version>
-
   <name>gif-processor</name>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -32,18 +29,6 @@
       <artifactId>javacv-platform</artifactId>
       <version>1.5.1</version>
     </dependency>
-
-    <dependency>
-      <groupId>org.bytedeco</groupId>
-      <artifactId>javacpp</artifactId>
-      <version>1.5.1</version>
-    </dependency>
-      <dependency>
-          <groupId>org.jetbrains</groupId>
-          <artifactId>annotations</artifactId>
-          <version>13.0</version>
-          <scope>compile</scope>
-      </dependency>
 
   </dependencies>
 
