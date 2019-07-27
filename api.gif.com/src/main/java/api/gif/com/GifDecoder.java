@@ -1,15 +1,12 @@
-package com.giphy.app;
+package api.gif.com;
 
-import org.bytedeco.javacv.Java2DFrameUtils;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class GifDecoder {
 

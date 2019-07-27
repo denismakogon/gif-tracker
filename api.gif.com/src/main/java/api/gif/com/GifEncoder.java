@@ -1,4 +1,4 @@
-package com.giphy.app;
+package api.gif.com;
 //
 //  GifEncoder.java
 //  

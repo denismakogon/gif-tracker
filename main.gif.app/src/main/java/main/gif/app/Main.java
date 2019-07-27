@@ -1,12 +1,17 @@
-package com.giphy.app;
-
-import java.awt.image.BufferedImage;
-import java.io.*;
+package main.gif.app;
 
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
-public class App {
+import api.facedetect.com.*;
+import api.gif.com.*;
+
+
+public class Main {
 
     public static void main(String[] args) {
 

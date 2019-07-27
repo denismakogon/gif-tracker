@@ -1,4 +1,4 @@
-package com.giphy.app;
+package api.facedetect.com;
 
 import org.bytedeco.javacpp.Loader;
 import org.bytedeco.javacv.Java2DFrameUtils;
@@ -6,6 +6,8 @@ import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Rect;
 import org.bytedeco.opencv.opencv_core.RectVector;
 import org.bytedeco.opencv.opencv_objdetect.CascadeClassifier;
+
+import api.gif.com.GifDecoder;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -22,7 +24,7 @@ public class FaceDetect {
     private CascadeClassifier classifier = null;
     private Fiber downloadFiber;
 
-    FaceDetect() {
+    public FaceDetect() {
         this.downloadFiber = FiberScope.background().schedule(() -> {
             try {
                 this.setupClassifier();

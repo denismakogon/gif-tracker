@@ -1,4 +1,4 @@
-package com.giphy.app;
+package api.facedetect.com;
 
 import org.junit.Test;
 
