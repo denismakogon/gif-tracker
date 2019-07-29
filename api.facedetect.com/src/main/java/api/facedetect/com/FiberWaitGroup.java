@@ -1,7 +1,6 @@
 package api.facedetect.com;
 
 import java.util.HashMap;
-import java.util.concurrent.ExecutionException;
 
 public class FiberWaitGroup {
 
