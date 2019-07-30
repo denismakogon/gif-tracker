@@ -4,13 +4,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.giphy.app</groupId>
+  <groupId>com.giphy</groupId>
   <artifactId>gif-processor</artifactId>
   <packaging>pom</packaging>
   <version>1.0</version>
   <modules>
-    <module>api.facedetect.com</module>
     <module>api.gif.com</module>
+    <module>api.facedetect.com</module>
     <module>main.app</module>
   </modules>
   <name>gif-processor</name>
@@ -24,11 +24,13 @@
   <build>
 
     <plugins>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
       </plugin>
+
     </plugins>
 
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->

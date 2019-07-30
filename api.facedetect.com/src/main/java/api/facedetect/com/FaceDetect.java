@@ -1,7 +1,6 @@
 package api.facedetect.com;
 
 import org.bytedeco.javacpp.Loader;
-import org.bytedeco.javacv.Java2DFrameUtils;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Rect;
 import org.bytedeco.opencv.opencv_core.RectVector;
@@ -17,7 +16,6 @@ import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
-
 
 public class FaceDetect {
 

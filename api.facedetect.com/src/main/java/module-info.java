@@ -5,11 +5,11 @@ module api.facedetect.com {
     requires java.desktop;
 
     // 3rd-party
-    requires org.bytedeco.opencv.platform;
-    requires org.bytedeco.javacv.platform;
+    requires org.bytedeco.opencv;
 
-    // local modules
+    // local
     requires api.gif.com;
 
+    // exports to public space
     exports api.facedetect.com;
 }

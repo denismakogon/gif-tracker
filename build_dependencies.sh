@@ -17,4 +17,4 @@ mvn clean package dependency:copy-dependencies \
     -Dmdep.prependGroupId=true \
     -DoutputDirectory=../target \
     --fail-never \
-    -Djavacpp.platform=${os_type}-${os_arch}
+    -Dplatform.id=${os_type}-${os_arch}

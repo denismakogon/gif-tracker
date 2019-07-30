@@ -2,4 +2,4 @@
 
 set -xe
 
-java -cp $(echo /target/*.jar | tr ' ' ':') com.giphy.app.App /original.gif
+/jdk/bin/java -cp $(echo /target/*.jar | tr ' ' ':') main.app.Main /original.gif
