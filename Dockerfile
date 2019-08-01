@@ -9,13 +9,15 @@ RUN mvn clean && ./build_dependencies.sh && mvn package
 
 FROM oraclelinux:7-slim
 
-RUN curl -L https://raw.githubusercontent.com/denismakogon/oraclelinux-opencv/master/apply_binaries.sh | /bin/bash
-RUN yum update -y && yum install -y gtk2-devel
-ADD original.gif /original.gif
-
 COPY --from=manve-stage /project/target/*.jar /target/
 COPY --from=maven-stage /project/main.app/target/maven-jlink /jdk
 
+RUN curl -L https://raw.githubusercontent.com/denismakogon/oraclelinux-opencv/master/apply_binaries.sh | /bin/bash
+RUN yum update -y && yum install -y gtk2-devel
+
+ADD original.gif /original.gif
 ADD entrypoint.sh /entrypoint.sh
+
+ENV JAVA_HOME=/jdk
 
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
